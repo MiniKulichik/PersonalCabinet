@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")
@@ -57,4 +59,25 @@ public class UserController {
 
     // "/" - getCurrentUser (получение текущего пользователя в системе)
     // "allUsers" - getUsers (получение всех пользователей)
+
+
+    // "/" - getCurrentUser (получение текущего пользователя в системе)
+    @GetMapping("/")
+    public ResponseEntity<UserDTO> getCurrentUser(Principal principal) {
+        User user = userService.getCurrentUser(principal);
+        UserDTO userDTO = userFacade.userToUserDTO(user);
+
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
+    // "/allUsers" - getAllUsers (получение всех пользователей)
+    @GetMapping("/allUsers")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        List<UserDTO> userDTOs = users.stream()
+                .map(userFacade::userToUserDTO)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(userDTOs, HttpStatus.OK);
+    }
 }
